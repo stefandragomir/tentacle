@@ -8,11 +8,27 @@ from PyQt5.QtWidgets  import *
 *************************************************************************************************"""
 class Tentacle(QWidget):
 
-	def __init__(self,model):
+    def __init__(self,model):
 
-		QWidget.__init__(self)
+        QWidget.__init__(self)
 
-		self.model = model
+        self.model = model
+
+        self.__draw()
+
+    def __draw(self):
+
+        self.scene = QGraphicsScene()
+        self.view  = QGraphicsView(self.scene)
+
+        self.ly_main = QHBoxLayout()
+        self.ly_main.addWidget(self.view)
+
+        self.setLayout(self.ly_main)
+
+    def render(self):
+        
+        pass
 
 """*************************************************************************************************
 ****************************************************************************************************
