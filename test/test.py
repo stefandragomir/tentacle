@@ -7,7 +7,6 @@ from PyQt5.QtGui      import *
 from PyQt5.QtWidgets  import *
 
 from tentacle import Tentacle
-from model_1  import MODEL
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -31,7 +30,7 @@ class Tentacle_Test(QMainWindow):
 
 
         self.wdg_central  = QWidget()
-        self.wdg_tentacle = Tentacle(MODEL)
+        self.wdg_tentacle = Tentacle()
 
         self.ly_main = QVBoxLayout()
         self.ly_main.addWidget(self.wdg_tentacle)
