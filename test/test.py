@@ -7,6 +7,7 @@ from PyQt5.QtGui      import *
 from PyQt5.QtWidgets  import *
 
 from tentacle import Tentacle
+from tentacle import Tentacle_Node
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -30,10 +31,10 @@ class Tentacle_Test(QMainWindow):
 
 
         self.wdg_central  = QWidget()
-        self.wdg_tentacle = Tentacle()
+        self.tentacle     = Tentacle()
 
         self.ly_main = QVBoxLayout()
-        self.ly_main.addWidget(self.wdg_tentacle)
+        self.ly_main.addWidget(self.tentacle)
         
         self.wdg_central.setLayout(self.ly_main)  
 
@@ -41,12 +42,35 @@ class Tentacle_Test(QMainWindow):
 
         self.activateWindow() 
 
-        self.wdg_tentacle.render()
+        self.draw_tentacles()
+
+    def draw_tentacles(self):
+
+        _node_1     = Tentacle_Node("Node 1",     None)
+        _node_1_1   = Tentacle_Node("Node 1 1",   None)
+        _node_1_2   = Tentacle_Node("Node 1 2",   None)
+        _node_1_1_1 = Tentacle_Node("Node 1 1 1", None)
+        _node_1_1_2 = Tentacle_Node("Node 1 1 2", None)
+        _node_1_2_1 = Tentacle_Node("Node 1 2 1", None)
+        _node_1_2_2 = Tentacle_Node("Node 1 2 2", None)
+
+        self.tentacle.add(None,      _node_1)
+        self.tentacle.add(_node_1,   _node_1_1)  
+        self.tentacle.add(_node_1,   _node_1_2) 
+        self.tentacle.add(_node_1_1, _node_1_1_1)
+        self.tentacle.add(_node_1_1, _node_1_1_2)
+        self.tentacle.add(_node_1_2, _node_1_2_1)
+        self.tentacle.add(_node_1_2, _node_1_2_2)
+
+        self.tentacle.render() 
+
+        for _node in self.tentacle.walk():
+
+            print(_node.label)       
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-
 if __name__ == "__main__":
 
     _app = QApplication(sys.argv)  

@@ -1,5 +1,6 @@
 
 import math
+import uuid
 
 from PyQt5.QtCore     import *
 from PyQt5.QtGui      import *
@@ -9,20 +10,15 @@ from PyQt5.QtWidgets  import *
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-"""
-
-NODE -> EDGE -> NODE -> EDGE -> NODE
-
-"""
-
-"""*************************************************************************************************
-****************************************************************************************************
-*************************************************************************************************"""
 class Tentacle(QWidget):
 
-    def __init__(self):
+    def __init__(self,node_width=100,node_height=100):
 
         QWidget.__init__(self)
+
+        self.node_width  = node_width
+        self.node_height = node_height
+        self.nodes       = Tentacle_Nodes()
 
         self.__draw()
 
@@ -48,39 +44,46 @@ class Tentacle(QWidget):
         self.view.scale(0.8, 0.8)
         self.view.setMinimumSize(400, 400)
 
+    def add(self,parent,node):
+
+        if None == parent:
+            self.nodes.add(node)            
+        else:      
+            parent.add(node)     
+
     def render(self):
 
-        _nd1 = Tentacle_Node()
-        _nd2 = Tentacle_Node()
-        _nd3 = Tentacle_Node()
+        for _node in self.nodes:
 
-        _e1 = Tentacle_Node(_nd1, _nd2)
-        _e2 = Tentacle_Node(_nd2, _nd3)
+            self.scene.addItem(_node)
 
-        self.scene.addItem(_nd1)
-        self.scene.addItem(_nd2)
-        self.scene.addItem(_nd3)
+    def walk(self,node=None):
 
+        _walked_nodes = []
 
-        self.scene.addItem(_e1)
-        self.scene.addItem(_e2)
+        if None == node:
+            for _node in self.nodes:
+                _walked_nodes += _node.walk()
+        else:
+            _walked_nodes = node.walk()
 
-        _nd1.setPos(-50, -50)
-        _nd2.setPos(0, -50)
-        _nd3.setPos(50, -50)
+        return _walked_nodes
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class Tentacle_Node(QGraphicsItem):
 
-    def __init__(self,label="",icon=""):
+    def __init__(self,label="",icon=None):
 
         QGraphicsItem.__init__(self) 
 
-        self.edges = []
-        self.label = ""
-        self.icon  = None
+        self.id       = uuid.uuid4().hex
+        self.label    = label
+        self.icon     = None
+        self.width    = 200
+        self.height   = 100
+        self.nodes    = Tentacle_Nodes()
 
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -88,44 +91,103 @@ class Tentacle_Node(QGraphicsItem):
         self.setZValue(-1)
 
     def boundingRect(self):
-
-        _adjust = 2;
         
-        _rect = QRectF( -10 - _adjust, -10 - _adjust, 23 + _adjust, 23 + _adjust)
+        _rect = QRectF(0, 0, self.width, self.height)
         
         return _rect
 
     def paint(self,painter,option,wdg):
 
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(Qt.darkGray)
-        painter.drawEllipse(-7, -7, 20, 20)
+        _pen = QPen(Qt.black, 0)
 
-        _gradient = QRadialGradient(-3, -3, 10)
+        painter.setPen(_pen)
 
-        if option.state & QStyle.State_Sunken:
+        painter.drawRect(0, 0, self.width, self.height)
 
-            _gradient.setCenter(3, 3)
-            _gradient.setFocalPoint(3, 3)
-            _gradient.setColorAt(1, QColor(Qt.yellow).light(120))
-            _gradient.setColorAt(0, QColor(Qt.darkYellow).light(120))
-        
-        else:
-            _gradient.setColorAt(0, Qt.yellow)
-            _gradient.setColorAt(1, Qt.darkYellow)
-
-        
-        painter.setBrush(_gradient)
-        painter.setPen(QPen(Qt.black, 0))
-        painter.drawEllipse(-10, -10, 20, 20)
+        painter.drawText(0, 0, self.label)
 
     def shape(self):
 
         _path = QPainterPath()
         
-        _path.addEllipse(-10, -10, 20, 20)
+        _path.addRect(0, 0, self.width, self.height)
     
         return _path
+
+    def add(self,node):
+
+        self.nodes.add(node)
+
+    def walk(self):
+
+        _walked_nodes = [self]
+
+        for _node in self.nodes:
+
+            _walked_nodes += _node.walk()
+
+        return _walked_nodes
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class Tentacle_Nodes(object):
+
+    def __init__(self):
+
+        self.objects = []
+
+    def add(self,obj):
+
+        self.objects.append(obj)  
+
+    def __repr__(self):
+
+        return self.__print()
+
+    def __str__(self):
+
+        return self.__print()
+
+    def __print(self):
+
+        _txt = ""
+        
+        for obj in self.objects:
+
+            _txt += str(obj)
+
+        return _txt
+
+    def __iter__(self):
+
+        for obj in self.objects:
+
+            yield obj
+
+    def __getitem__(self,index):
+
+        return self.objects[index]
+
+    def __len__(self):
+
+        return len(self.objects)
+
+    def find_by_attribute(self,attribute,value):
+
+        _object = None
+
+        for _obj in self.objects:
+
+            if getattr(_obj,attribute) == value:
+
+                _object = _obj
+
+        return _object
+
+    def __contains__(self,obj):
+
+        return obj.id in [_local_obj.id for _local_obj in self.objects]
 
 """*************************************************************************************************
 ****************************************************************************************************
