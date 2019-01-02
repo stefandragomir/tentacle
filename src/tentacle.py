@@ -32,7 +32,6 @@ class Tentacle(QWidget):
 
         self.setLayout(self.ly_main)
 
-
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.scene.setSceneRect(-200, -200, 400, 400)
 
@@ -42,20 +41,17 @@ class Tentacle(QWidget):
         self.view.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
 
         self.view.scale(0.8, 0.8)
-        self.view.setMinimumSize(400, 400)
+        self.view.setMinimumSize(400, 400)    
 
     def add(self,parent,node):
+
+        node.nd_width  = self.node_width
+        node.nd_height = self.node_height 
 
         if None == parent:
             self.nodes.add(node)            
         else:      
             parent.add(node)     
-
-    def render(self):
-
-        for _node in self.nodes:
-
-            self.scene.addItem(_node)
 
     def walk(self,node=None):
 
@@ -69,6 +65,36 @@ class Tentacle(QWidget):
 
         return _walked_nodes
 
+    def count(self,node=None):
+
+        _depth = 1
+
+        if None == node:
+            for _node in self.nodes:
+                _depth += _node.depth()
+        else:
+            _depth = node.depth()
+
+        return _depth
+
+    def depth(self,node=None):
+
+        _depth = []
+
+        if None == node:
+            for _node in self.nodes:
+                _depth += _node.depth()
+        else:
+            _depth = node.depth()
+
+        return max(_depth)
+
+    def render(self):
+
+        for _node in self.nodes:
+
+            self.scene.addItem(_node)
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -78,12 +104,15 @@ class Tentacle_Node(QGraphicsItem):
 
         QGraphicsItem.__init__(self) 
 
-        self.id       = uuid.uuid4().hex
-        self.label    = label
-        self.icon     = None
-        self.width    = 200
-        self.height   = 100
-        self.nodes    = Tentacle_Nodes()
+        self.id          = uuid.uuid4().hex
+        self.label       = label
+        self.icon        = None
+        self.nd_width    = 100
+        self.nd_height   = 100
+        self.nd_x        = 0 
+        self.nd_y        = 0
+        self.is_visible  = True
+        self.nodes       = Tentacle_Nodes()
 
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -92,7 +121,7 @@ class Tentacle_Node(QGraphicsItem):
 
     def boundingRect(self):
         
-        _rect = QRectF(0, 0, self.width, self.height)
+        _rect = QRectF(0, 0, self.nd_width, self.nd_height)
         
         return _rect
 
@@ -102,7 +131,7 @@ class Tentacle_Node(QGraphicsItem):
 
         painter.setPen(_pen)
 
-        painter.drawRect(0, 0, self.width, self.height)
+        painter.drawRect(0, 0, self.nd_width, self.nd_height)
 
         painter.drawText(0, 0, self.label)
 
@@ -110,7 +139,7 @@ class Tentacle_Node(QGraphicsItem):
 
         _path = QPainterPath()
         
-        _path.addRect(0, 0, self.width, self.height)
+        _path.addRect(0, 0, self.nd_width, self.nd_height)
     
         return _path
 
@@ -128,6 +157,26 @@ class Tentacle_Node(QGraphicsItem):
 
         return _walked_nodes
 
+    def count(self):
+
+        _depth = 1
+
+        for _node in self.nodes:
+
+            _depth += _node.depth()
+
+        return _depth
+
+    def depth(self,start=0):
+
+        _depth = [start + 1]
+
+        for _node in self.nodes:
+
+            _depth += _node.depth(start + 1)
+
+        return _depth
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -140,24 +189,6 @@ class Tentacle_Nodes(object):
     def add(self,obj):
 
         self.objects.append(obj)  
-
-    def __repr__(self):
-
-        return self.__print()
-
-    def __str__(self):
-
-        return self.__print()
-
-    def __print(self):
-
-        _txt = ""
-        
-        for obj in self.objects:
-
-            _txt += str(obj)
-
-        return _txt
 
     def __iter__(self):
 
