@@ -135,6 +135,9 @@ class Tentacle_Node(QGraphicsItem):
         self.bt_plus  = Tentacle_Node_Button(Tentacle_ICON("plus"),Tentacle_ICON("plus_hover"),"")
         self.bt_minus = Tentacle_Node_Button(Tentacle_ICON("minus"),Tentacle_ICON("minus_hover"),"")
 
+        self.bt_plus.register_button_clbk(self.__clbk_plus)
+        self.bt_minus.register_button_clbk(self.__clbk_minus)
+
     def __draw_icon(self,icon):
 
         if None == icon:
@@ -256,6 +259,16 @@ class Tentacle_Node(QGraphicsItem):
             self.lbl_lbl.setText(self.label[:(_text_limit - 1)] + "...")
         else:
             self.lbl_lbl.setText(self.label)
+
+    def __clbk_plus(self):
+
+        self.bt_minus.show()
+        self.bt_plus.hide()
+
+    def __clbk_minus(self):
+
+        self.bt_plus.show()
+        self.bt_minus.hide()
 
 """*************************************************************************************************
 ****************************************************************************************************
