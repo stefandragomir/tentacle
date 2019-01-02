@@ -46,7 +46,7 @@ class Tentacle_Test(QMainWindow):
 
     def draw_tentacles(self):
 
-        _node_1     = Tentacle_Node("Node 1",     None)
+        _node_1     = Tentacle_Node("TRS-C3256_NFGS-466273846324NGSHST-9999",     None)
         _node_1_1   = Tentacle_Node("Node 1 1",   None)
         _node_1_2   = Tentacle_Node("Node 1 2",   None)
         _node_1_1_1 = Tentacle_Node("Node 1 1 1", None)
@@ -63,12 +63,7 @@ class Tentacle_Test(QMainWindow):
         self.tentacle.add(_node_1_2, _node_1_2_2)
 
         self.tentacle.render() 
-
-        for _node in self.tentacle.walk():
-
-            print(_node.label)  
-
-        print(self.tentacle.depth())     
+   
 
 """*************************************************************************************************
 ****************************************************************************************************
